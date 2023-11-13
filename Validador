@@ -1,0 +1,123 @@
+import java.util.Scanner;
+
+public class ValidadorGeral {
+
+	public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Escolha a opção: \n1 - CPF \n2 - CNPJ");
+        int opcao = scanner.nextInt();
+        scanner.nextLine();
+
+        if (opcao == 1) {
+            System.out.println("Digite o CPF (9 ou 11 dígitos):");
+            String cpf = scanner.nextLine();
+            if (cpf.length() == 9) {
+                cpf = gerarDigitosCPF(cpf);
+            }
+            System.out.println("CPF: " + formatarCPF(cpf));
+            System.out.println("Dígito verificador é válido: " + verificarCPF(cpf));
+        } else if (opcao == 2) {
+            System.out.println("Digite o CNPJ (12 ou 14 dígitos):");
+            String cnpj = scanner.nextLine();
+            if (cnpj.length() == 12) {
+                cnpj = gerarDigitosCNPJ(cnpj);
+            }
+            System.out.println("CNPJ: " + formatarCNPJ(cnpj));
+            System.out.println("Dígito verificador é válido: " + verificarCNPJ(cnpj));
+        } else {
+            System.out.println("Opção inválida. Tente novamente.");
+        }
+        scanner.close();
+    }
+
+    public static String formatarCPF(String cpf) {
+        return cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "." + cpf.substring(6, 9) + "-" + cpf.substring(9);
+    }
+
+    public static boolean verificarCPF(String cpf) {
+        if (todosDigitosIguais(cpf)) return false;
+        int soma = 0, peso = 10;
+        for (int i = 0; i < 9; i++) {
+            soma += Integer.parseInt(cpf.substring(i, i + 1)) * peso--;
+        }
+        int resto = (soma * 10) % 11;
+        if (resto == 10) resto = 0;
+        if (resto != Integer.parseInt(cpf.substring(9, 10))) return false;
+
+        soma = 0;
+        peso = 11;
+        for (int i = 0; i < 10; i++) {
+            soma += Integer.parseInt(cpf.substring(i, i + 1)) * peso--;
+        }
+        resto = (soma * 10) % 11;
+        if (resto == 10) resto = 0;
+        return resto == Integer.parseInt(cpf.substring(10));
+    }
+
+    public static String gerarDigitosCPF(String cpf) {
+        for (int i = 0; i < 2; i++) {
+            int soma = 0, peso = 10 + i;
+            for (int j = 0; j < 9 + i; j++) {
+                soma += Integer.parseInt(cpf.substring(j, j + 1)) * peso--;
+            }
+            int resto = (soma * 10) % 11;
+            if (resto == 10) resto = 0;
+            cpf += Integer.toString(resto);
+        }
+        return cpf;
+    }
+
+    public static String formatarCNPJ(String cnpj) {
+        return cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12);
+    }
+
+    public static boolean verificarCNPJ(String cnpj) {
+        if (todosDigitosIguais(cnpj)) return false;
+        int[] pesos1 = {5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
+        int[] pesos2 = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
+        int soma = 0;
+        for (int i = 0; i < 12; i++) {
+            soma += Integer.parseInt(cnpj.substring(i, i + 1)) * pesos1[i];
+        }
+        int resto = (soma % 11);
+        if (resto < 2) resto = 0;
+        else resto = 11 - resto;
+        if (resto != Integer.parseInt(cnpj.substring(12, 13))) return false;
+
+        soma = 0;
+        for (int i = 0; i < 13; i++) {
+            soma += Integer.parseInt(cnpj.substring(i, i + 1)) * pesos2[i];
+        }
+        resto = (soma % 11);
+        if (resto < 2) resto = 0;
+        else resto = 11 - resto;
+        return resto == Integer.parseInt(cnpj.substring(13));
+    }
+
+    public static String gerarDigitosCNPJ(String cnpj) {
+        for (int i = 0; i < 2; i++) {
+            int soma = 0;
+            int[] pesos = (i == 0) ? new int[]{5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2} : new int[]{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
+            for (int j = 0; j < 12 + i; j++) {
+                soma += Integer.parseInt(cnpj.substring(j, j + 1)) * pesos[j];
+            }
+            int resto = (soma % 11);
+            if (resto < 2) resto = 0;
+            else resto = 11 - resto;
+            cnpj += Integer.toString(resto);
+        }
+        return cnpj;
+    }
+
+    public static boolean todosDigitosIguais(String str) {
+        for (int i = 1; i < str.length(); i++) {
+            if (str.charAt(i) != str.charAt(0)) return false;
+        }
+        return true;
+    }
+		 
+		 
+		 
+		 
+		 
+}
